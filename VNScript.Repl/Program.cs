@@ -4,7 +4,7 @@ using VNScript.CodeAnalysis.Syntax;
 using VNScript.CodeAnalysis.Text;
 
 var showTree = false;
-var variables = new Dictionary<VariableSymbol, object>();
+var variables = new Dictionary<VariableSymbol?, object>();
 var textBuilder = new StringBuilder();
 Compilation? previous = null;
 

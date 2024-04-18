@@ -30,6 +30,10 @@ public static class SyntaxFacts
 
             case SyntaxKind.EqualsEqualsToken:
             case SyntaxKind.BangEqualsToken:
+            case SyntaxKind.LessToken:
+            case SyntaxKind.LessOrEqualsToken:
+            case SyntaxKind.GreaterToken:
+            case SyntaxKind.GreaterOrEqualsToken:
                 return 3;
 
             case SyntaxKind.AmpersandAmpersandToken:
@@ -81,6 +85,10 @@ public static class SyntaxFacts
             case SyntaxKind.TrueKeyword: return "true";
             case SyntaxKind.LetKeyword: return "let";
             case SyntaxKind.VarKeyword: return "var";
+            case SyntaxKind.LessToken: return "<";
+            case SyntaxKind.GreaterToken: return ">";
+            case SyntaxKind.LessOrEqualsToken: return "<=";
+            case SyntaxKind.GreaterOrEqualsToken: return ">=";
             default: return null;
         }
     }

@@ -6,10 +6,10 @@ namespace VNScript.CodeAnalysis;
 internal sealed class Evaluation
 {
     private readonly BoundStatement _root;
-    private readonly Dictionary<VariableSymbol, object> _variables;
+    private readonly Dictionary<VariableSymbol?, object> _variables;
     private object _lastValue = null!;
 
-    public Evaluation(BoundStatement root, Dictionary<VariableSymbol, object> variables)
+    public Evaluation(BoundStatement root, Dictionary<VariableSymbol?, object> variables)
     {
         _root = root;
         _variables = variables;
@@ -105,6 +105,10 @@ internal sealed class Evaluation
             BoundBinaryOperatorKind.LogicalEquals => Equals(left, right),
             BoundBinaryOperatorKind.LogicalNotEquals => !Equals(left, right),
             BoundBinaryOperatorKind.Exponentation => (int)Math.Pow((int)left, (int)right),
+            BoundBinaryOperatorKind.LessThan => (int)left < (int)right,
+            BoundBinaryOperatorKind.LessThanOrEqualTo => (int)left <= (int)right,
+            BoundBinaryOperatorKind.GreaterThan => (int)left > (int)right,
+            BoundBinaryOperatorKind.GreaterThanOrEqualTo => (int)left >= (int)right,
             _ => throw new Exception($"Unexpected binary operator {b.Op.Kind}")
         };
     }

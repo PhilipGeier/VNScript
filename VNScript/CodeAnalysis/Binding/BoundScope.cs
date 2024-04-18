@@ -4,7 +4,7 @@ namespace VNScript.CodeAnalysis.Binding;
 
 internal sealed class BoundScope
 {
-    private readonly Dictionary<string, VariableSymbol> _variables = new();
+    private readonly Dictionary<string, VariableSymbol?> _variables = new();
     public BoundScope? Parent { get; }
 
     public BoundScope(BoundScope? parent)
@@ -12,7 +12,7 @@ internal sealed class BoundScope
         Parent = parent;
     }
 
-    public bool TryDeclare(VariableSymbol variable)
+    public bool TryDeclare(VariableSymbol? variable)
     {
         if (_variables.ContainsKey(variable.Name))
             return false;
@@ -21,7 +21,7 @@ internal sealed class BoundScope
         return true;
     }
     
-    public bool TryLookup(string name, out VariableSymbol variable)
+    public bool TryLookup(string name, out VariableSymbol? variable)
     {
         if (_variables.TryGetValue(name, out variable))
             return true;
@@ -32,7 +32,7 @@ internal sealed class BoundScope
         return Parent.TryLookup(name, out variable);
     }
 
-    public ImmutableArray<VariableSymbol> GetDeclaredVariables()
+    public ImmutableArray<VariableSymbol?> GetDeclaredVariables()
     {
         return _variables.Values.ToImmutableArray();
     }

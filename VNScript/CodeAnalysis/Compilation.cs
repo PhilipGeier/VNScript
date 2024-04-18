@@ -40,7 +40,7 @@ public class Compilation
         return new Compilation(this, syntaxTree);
     }
     
-    public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
+    public EvaluationResult Evaluate(Dictionary<VariableSymbol?, object> variables)
     {
         
         var diagnostics = SyntaxTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToArray();

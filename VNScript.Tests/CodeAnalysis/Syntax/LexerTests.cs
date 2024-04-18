@@ -156,6 +156,14 @@ public class LexerTests
         if (t1Kind == SyntaxKind.AsteriskToken && t2Kind == SyntaxKind.AsteriskToken) return true;
 
         if (t1Kind == SyntaxKind.AsteriskToken && t2Kind == SyntaxKind.AsteriskAsteriskToken) return true;
+        
+        if (t1Kind == SyntaxKind.LessToken && t2Kind == SyntaxKind.EqualsToken) return true;
+        
+        if (t1Kind == SyntaxKind.LessToken && t2Kind == SyntaxKind.EqualsEqualsToken) return true;
+        
+        if (t1Kind == SyntaxKind.GreaterToken && t2Kind == SyntaxKind.EqualsToken) return true;
+        
+        if (t1Kind == SyntaxKind.GreaterToken && t2Kind == SyntaxKind.EqualsEqualsToken) return true;
 
         return false;
     }

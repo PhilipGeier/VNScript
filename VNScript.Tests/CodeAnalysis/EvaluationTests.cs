@@ -18,6 +18,14 @@ public class EvaluationTests
     [InlineData("3 == 3", true)]
     [InlineData("3 != 3", false)]
     [InlineData("3 != 5", true)]
+    [InlineData("3 > 5", false)]
+    [InlineData("3 < 5", true)]
+    [InlineData("1 < 4", true)]
+    [InlineData("1 > 4", false)]
+    [InlineData("1 >= 1", true)]
+    [InlineData("1 <= 2", true)]
+    [InlineData("2 <= 1", false)]
+    [InlineData("2 >= 3", false)]
     [InlineData("false == false", true)]
     [InlineData("true == false", false)]
     [InlineData("false != false", false)]
@@ -119,7 +127,7 @@ public class EvaluationTests
 
         var compilation = new Compilation(expression);
 
-        var variables = new Dictionary<VariableSymbol, object>();
+        var variables = new Dictionary<VariableSymbol?, object>();
         var actualResult = compilation.Evaluate(variables);
 
         Assert.Empty(actualResult.Diagnostics);
@@ -132,7 +140,7 @@ public class EvaluationTests
         var syntaxTree = SyntaxTree.Parse(annotatedText.Text);
         var compilation = new Compilation(syntaxTree);
 
-        var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
+        var result = compilation.Evaluate(new Dictionary<VariableSymbol?, object>());
 
         var expectedSpan = annotatedText.Spans[0];
         var actualSpan = result.Diagnostics[0].Span;

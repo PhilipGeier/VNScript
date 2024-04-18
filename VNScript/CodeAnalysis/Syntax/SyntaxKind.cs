@@ -23,6 +23,10 @@ public enum SyntaxKind
     EqualsToken,
     OpenBraceToken,
     CloseBraceToken,
+    LessToken,
+    LessOrEqualsToken,
+    GreaterToken,
+    GreaterOrEqualsToken,
     
     // Keywords
     FalseKeyword,
