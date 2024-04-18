@@ -49,6 +49,10 @@ public static class SyntaxFacts
                 return SyntaxKind.TrueKeyword;
             case "false":
                 return SyntaxKind.FalseKeyword;
+            case "let":
+                return SyntaxKind.LetKeyword;
+            case "var":
+                return SyntaxKind.VarKeyword;
             default:
                 return SyntaxKind.IdentifierToken;
         }
@@ -75,6 +79,8 @@ public static class SyntaxFacts
             case SyntaxKind.EqualsToken: return "=";
             case SyntaxKind.FalseKeyword: return "false";
             case SyntaxKind.TrueKeyword: return "true";
+            case SyntaxKind.LetKeyword: return "let";
+            case SyntaxKind.VarKeyword: return "var";
             default: return null;
         }
     }

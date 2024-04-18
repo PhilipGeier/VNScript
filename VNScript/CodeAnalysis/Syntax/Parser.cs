@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text.RegularExpressions;
 using VNScript.CodeAnalysis.Text;
 
 namespace VNScript.CodeAnalysis.Syntax;
@@ -49,17 +50,20 @@ internal sealed class Parser
 
     private StatementSyntax ParseStatement()
     {
-        if (Current.Kind == SyntaxKind.OpenBraceToken)
+        return Current.Kind switch
         {
-            return ParseBlockStatement();
-        }
-
-        return ParseExpressionStatement();
+            SyntaxKind.OpenBraceToken => ParseBlockStatement(),
+            SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(),
+            _ => ParseExpressionStatement()
+        };
     }
 
+    
     private StatementSyntax ParseExpressionStatement()
     {
         var expression = ParseExpression();
+        // TODO: SemiColonToken
+        // var semiColonToken = MatchToken(SyntaxKind.SemiColonToken);
         return new ExpressionStatementSyntax(expression);
     }
 
@@ -81,6 +85,21 @@ internal sealed class Parser
         return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
     }
 
+    private StatementSyntax ParseVariableDeclaration()
+    {
+        var expected = Current.Kind == SyntaxKind.LetKeyword
+            ? SyntaxKind.LetKeyword
+            : SyntaxKind.VarKeyword;
+
+        var keyword = MatchToken(expected);
+        var identifier = MatchToken(SyntaxKind.IdentifierToken);
+        var equals = MatchToken(SyntaxKind.EqualsToken);
+        var initializer = ParseExpression();
+        // var semiColon = MatchToken(SyntaxKind.SemiColonToken);
+
+        return new VariableDeclarationSyntax(keyword, identifier, equals, initializer /* , semiColon */);
+    }
+    
     private ExpressionSyntax ParseAssignmentExpression()
     {
         if (Peek(0).Kind == SyntaxKind.IdentifierToken && 

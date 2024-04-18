@@ -11,5 +11,6 @@ public enum BoundNodeKind
     
     // Statements
     BlockStatement,
-    ExpressionStatement
+    ExpressionStatement,
+    VariableDeclaration
 }
