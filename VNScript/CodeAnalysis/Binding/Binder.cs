@@ -59,7 +59,7 @@ internal sealed class Binder
 
         if (!_scope.TryDeclare(variable))
         {
-            Diagnostics.ReportVariableAlreadyDeclared(syntax.Initializer.Span, name);
+            Diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
         }
 
         return new BoundVariableDeclaration(variable, initializer);
