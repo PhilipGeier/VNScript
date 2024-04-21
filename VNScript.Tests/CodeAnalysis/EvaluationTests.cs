@@ -35,6 +35,10 @@ public class EvaluationTests
     [InlineData("!true", false)]
     [InlineData("!false", true)]
     [InlineData("{ var a = 0 (a = 10) * a }", 100)]
+    [InlineData("{ var a = 0 if a == 0 a = 10 a }", 10)]
+    [InlineData("{ var a = 0 if a == 4 a = 10 a }", 0)]
+    [InlineData("{ var a = 0 if a == 4 a = 10 else a = 5 }", 5)]
+    [InlineData("{ var a = 0 if a == 0 a = 10 else a = 5 }", 10)]
     public void Evaluator_Computes_CorrectValue(string text, object expectedValue)
     {
         AssertValue(text, expectedValue);

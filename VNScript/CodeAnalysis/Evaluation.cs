@@ -6,10 +6,10 @@ namespace VNScript.CodeAnalysis;
 internal sealed class Evaluation
 {
     private readonly BoundStatement _root;
-    private readonly Dictionary<VariableSymbol?, object> _variables;
+    private readonly Dictionary<VariableSymbol, object> _variables;
     private object _lastValue = null!;
 
-    public Evaluation(BoundStatement root, Dictionary<VariableSymbol?, object> variables)
+    public Evaluation(BoundStatement root, Dictionary<VariableSymbol, object> variables)
     {
         _root = root;
         _variables = variables;
@@ -33,7 +33,9 @@ internal sealed class Evaluation
             _ => throw new Exception($"Unexpected Node {node.Kind}")
         };
     }
-    
+
+
+
     private void EvaluateStatement(BoundStatement statement)
     {
         switch (statement.Kind)
@@ -47,15 +49,31 @@ internal sealed class Evaluation
             case BoundNodeKind.VariableDeclaration:
                 EvaluateVariableDeclaration((BoundVariableDeclaration)statement);
                 break;
+            case BoundNodeKind.IfStatement:
+                EvaluateIfStatement((BoundIfStatement)statement);
+                break;
             default:
                 throw new Exception($"Unexpected statement {statement.Kind}");
+        }
+    }
+
+    private void EvaluateIfStatement(BoundIfStatement statement)
+    {
+        var condition = (bool)EvaluateExpression(statement.Condition);
+        if (condition)
+        {
+            EvaluateStatement(statement.ThenStatement);
+        }
+        else if (statement.ElseStatement is not null)
+        {
+            EvaluateStatement(statement.ElseStatement);
         }
     }
 
     private void EvaluateVariableDeclaration(BoundVariableDeclaration statement)
     {
         var value = EvaluateExpression(statement.Initializer);
-        _variables[statement.Variable] = value;
+        _variables[statement.Variable!] = value;
         _lastValue = value;
     }
 
@@ -129,4 +147,6 @@ internal sealed class Evaluation
     {
         return n.Value;
     }
+    
+    
 }

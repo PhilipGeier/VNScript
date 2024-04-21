@@ -57,6 +57,10 @@ public static class SyntaxFacts
                 return SyntaxKind.LetKeyword;
             case "var":
                 return SyntaxKind.VarKeyword;
+            case "if":
+                return SyntaxKind.IfKeyword;
+            case "else":
+                return SyntaxKind.ElseKeyword;
             default:
                 return SyntaxKind.IdentifierToken;
         }
@@ -81,14 +85,16 @@ public static class SyntaxFacts
             case SyntaxKind.EqualsEqualsToken: return "==";
             case SyntaxKind.BangEqualsToken: return "!=";
             case SyntaxKind.EqualsToken: return "=";
-            case SyntaxKind.FalseKeyword: return "false";
-            case SyntaxKind.TrueKeyword: return "true";
-            case SyntaxKind.LetKeyword: return "let";
-            case SyntaxKind.VarKeyword: return "var";
             case SyntaxKind.LessToken: return "<";
             case SyntaxKind.GreaterToken: return ">";
             case SyntaxKind.LessOrEqualsToken: return "<=";
             case SyntaxKind.GreaterOrEqualsToken: return ">=";
+            case SyntaxKind.FalseKeyword: return "false";
+            case SyntaxKind.TrueKeyword: return "true";
+            case SyntaxKind.LetKeyword: return "let";
+            case SyntaxKind.VarKeyword: return "var";
+            case SyntaxKind.IfKeyword: return "if";
+            case SyntaxKind.ElseKeyword: return "else";
             default: return null;
         }
     }

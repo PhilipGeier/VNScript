@@ -26,15 +26,23 @@ public abstract class SyntaxNode
         {
             if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
             {
-                var child = (SyntaxNode)property.GetValue(this)!;
-                yield return child;
+                var child = property.GetValue(this);
+
+                if (child is SyntaxNode castedChild)
+                {
+                    yield return castedChild;    
+                }
             }
             else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
             {
-                var children = (IEnumerable<SyntaxNode>)property.GetValue(this)!;
-                foreach (var child in children)
+                var children = property.GetValue(this)!;
+
+                if (children is IEnumerable<SyntaxNode> castedChildren)
                 {
-                    yield return child;
+                    foreach (var child in castedChildren)
+                    {
+                        yield return child;    
+                    }
                 }
             }
         }
