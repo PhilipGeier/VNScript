@@ -1,4 +1,5 @@
-﻿using VNScript.CodeAnalysis.Binding;
+﻿using System.Resources;
+using VNScript.CodeAnalysis.Binding;
 using VNScript.CodeAnalysis.Binding.Enums;
 
 namespace VNScript.CodeAnalysis;
@@ -54,6 +55,9 @@ internal sealed class Evaluation
             case BoundNodeKind.WhileStatement:
                 EvaluateWhileStatement((BoundWhileStatement)statement);
                 break;
+            case BoundNodeKind.ForStatement:
+                EvaluateForStatement((BoundForStatement)statement);
+                break;
             default:
                 throw new Exception($"Unexpected statement {statement.Kind}");
         }
@@ -98,6 +102,18 @@ internal sealed class Evaluation
     {
         while ((bool)EvaluateExpression(statement.Condition))
         {
+            EvaluateStatement(statement.Body);
+        }
+    }
+    
+    private void EvaluateForStatement(BoundForStatement statement)
+    {
+        var lowerBound = (int)EvaluateExpression(statement.LowerBound);
+        var upperBound = (int)EvaluateExpression(statement.UpperBound);
+
+        for (var i = lowerBound; i <= upperBound; i++)
+        {
+            _variables[statement.Variable] = i;
             EvaluateStatement(statement.Body);
         }
     }

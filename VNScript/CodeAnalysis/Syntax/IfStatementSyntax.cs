@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace VNScript.CodeAnalysis.Syntax;
 
 public sealed class IfStatementSyntax : StatementSyntax

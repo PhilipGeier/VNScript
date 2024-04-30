@@ -55,8 +55,11 @@ internal sealed class Parser
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(),
             SyntaxKind.IfKeyword => ParseIfStatement(),
             SyntaxKind.WhileKeyword => ParseWhileStatement(),
+            SyntaxKind.ForKeyword => ParseForStatement(),
             _ => ParseExpressionStatement()
         };
+
+    #region ParseStatement Switch Methods
 
 
     private StatementSyntax ParseExpressionStatement()
@@ -83,6 +86,21 @@ internal sealed class Parser
         var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
 
         return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
+    }
+    
+    private StatementSyntax ParseVariableDeclaration()
+    {
+        var expected = Current.Kind == SyntaxKind.LetKeyword
+            ? SyntaxKind.LetKeyword
+            : SyntaxKind.VarKeyword;
+
+        var keyword = MatchToken(expected);
+        var identifier = MatchToken(SyntaxKind.IdentifierToken);
+        var equals = MatchToken(SyntaxKind.EqualsToken);
+        var initializer = ParseExpression();
+        // var semiColon = MatchToken(SyntaxKind.SemiColonToken);
+
+        return new VariableDeclarationSyntax(keyword, identifier, equals, initializer /* , semiColon */);
     }
     
     private StatementSyntax ParseIfStatement()
@@ -113,21 +131,21 @@ internal sealed class Parser
         var body = ParseStatement();
         return new WhileStatementSyntax(keyword, condition, body);
     }
-
-    private StatementSyntax ParseVariableDeclaration()
+    
+    private StatementSyntax ParseForStatement()
     {
-        var expected = Current.Kind == SyntaxKind.LetKeyword
-            ? SyntaxKind.LetKeyword
-            : SyntaxKind.VarKeyword;
-
-        var keyword = MatchToken(expected);
+        var keyword = MatchToken(SyntaxKind.ForKeyword);
         var identifier = MatchToken(SyntaxKind.IdentifierToken);
-        var equals = MatchToken(SyntaxKind.EqualsToken);
-        var initializer = ParseExpression();
-        // var semiColon = MatchToken(SyntaxKind.SemiColonToken);
+        var equalsToken = MatchToken(SyntaxKind.EqualsToken);
+        var lowerBound = ParseExpression();
+        var toKeyword = MatchToken(SyntaxKind.ToKeyword);
+        var upperBound = ParseExpression();
+        var body = ParseStatement();
 
-        return new VariableDeclarationSyntax(keyword, identifier, equals, initializer /* , semiColon */);
+        return new ForStatementSyntax(keyword, identifier, equalsToken, lowerBound, toKeyword, upperBound, body);
     }
+    
+    #endregion
     
     private ExpressionSyntax ParseAssignmentExpression()
     {
@@ -250,5 +268,4 @@ internal sealed class Parser
         return new SyntaxToken(kind, Current.Position, null, null);
     }
 
-   
 }
