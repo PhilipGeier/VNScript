@@ -2,7 +2,7 @@ using VNScript.CodeAnalysis.Binding.Enums;
 
 namespace VNScript.CodeAnalysis.Binding;
 
-internal class BoundIfStatement : BoundStatement
+internal sealed class BoundIfStatement : BoundStatement
 {
     public BoundExpression Condition { get; }
     public BoundStatement ThenStatement { get; }
