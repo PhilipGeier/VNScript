@@ -35,7 +35,6 @@ internal sealed class Evaluation
     }
 
 
-
     private void EvaluateStatement(BoundStatement statement)
     {
         switch (statement.Kind)
@@ -52,9 +51,34 @@ internal sealed class Evaluation
             case BoundNodeKind.IfStatement:
                 EvaluateIfStatement((BoundIfStatement)statement);
                 break;
+            case BoundNodeKind.WhileStatement:
+                EvaluateWhileStatement((BoundWhileStatement)statement);
+                break;
             default:
                 throw new Exception($"Unexpected statement {statement.Kind}");
         }
+    }
+
+    #region EvaluateStatement Switch Methods
+
+    private void EvaluateBlockStatement(BoundBlockStatement statement)
+    {
+        foreach (var st in statement.Statements)
+        {
+            EvaluateStatement(st);
+        }
+    }
+
+    private void EvaluateExpressionStatement(BoundExpressionStatement statement)
+    {
+        _lastValue = EvaluateExpression(statement.Expression);
+    }
+
+    private void EvaluateVariableDeclaration(BoundVariableDeclaration statement)
+    {
+        var value = EvaluateExpression(statement.Initializer);
+        _variables[statement.Variable!] = value;
+        _lastValue = value;
     }
 
     private void EvaluateIfStatement(BoundIfStatement statement)
@@ -70,25 +94,15 @@ internal sealed class Evaluation
         }
     }
 
-    private void EvaluateVariableDeclaration(BoundVariableDeclaration statement)
+    private void EvaluateWhileStatement(BoundWhileStatement statement)
     {
-        var value = EvaluateExpression(statement.Initializer);
-        _variables[statement.Variable!] = value;
-        _lastValue = value;
-    }
-
-    private void EvaluateExpressionStatement(BoundExpressionStatement statement)
-    {
-        _lastValue = EvaluateExpression(statement.Expression);
-    }
-
-    private void EvaluateBlockStatement(BoundBlockStatement statement)
-    {
-        foreach (var st in statement.Statements)
+        while ((bool)EvaluateExpression(statement.Condition))
         {
-            EvaluateStatement(st);
+            EvaluateStatement(statement.Body);
         }
     }
+
+    #endregion
 
     private object EvaluateUnaryExpression(BoundUnaryExpression u)
     {
@@ -147,6 +161,4 @@ internal sealed class Evaluation
     {
         return n.Value;
     }
-    
-    
 }

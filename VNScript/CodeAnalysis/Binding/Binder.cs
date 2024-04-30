@@ -13,7 +13,7 @@ internal sealed class Binder
     {
         _scope = new BoundScope(parent);
     }
-    
+
     private BoundExpression BindExpression(ExpressionSyntax syntax)
     {
         switch (syntax.Kind)
@@ -46,55 +46,19 @@ internal sealed class Binder
 
         return result;
     }
-    
-    private BoundStatement BindStatement(StatementSyntax syntax)
-    {
-        switch (syntax.Kind)
+
+    private BoundStatement BindStatement(StatementSyntax syntax) =>
+        syntax.Kind switch
         {
-            case SyntaxKind.BlockStatement:
-                return BindBlockStatement((BlockStatementSyntax)syntax);
-            case SyntaxKind.ExpressionStatement:
-                return BindExpressionStatement((ExpressionStatementSyntax)syntax);
-            case SyntaxKind.VariableDeclaration:
-                return BindVariableDeclaration((VariableDeclarationSyntax)syntax);
-            case SyntaxKind.IfStatement:
-                return BindIfStatement((IfStatementSyntax)syntax);
-            default:
-                throw new Exception($"Unexpected syntax {syntax.Kind}");
-        }
-    }
+            SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
+            SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
+            SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
+            SyntaxKind.IfStatement => BindIfStatement((IfStatementSyntax)syntax),
+            SyntaxKind.WhileStatement => BindWhileStatement((WhileStatementSyntax)syntax),
+            _ => throw new Exception($"Unexpected syntax {syntax.Kind}")
+        };
 
-    private BoundStatement BindIfStatement(IfStatementSyntax syntax)
-    {
-        var condition = BindExpression(syntax.Condition, typeof(bool));
-        var thenStatement = BindStatement(syntax.ThenStatement);
-        var elseStatement = syntax.ElseClause is null
-            ? null
-            : BindStatement(syntax.ElseClause.ElseStatement);
-
-        return new BoundIfStatement(condition, thenStatement, elseStatement);
-    }
-
-    private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
-    {
-        var name = syntax.Identifier.Text!;
-        var isReadOnly = syntax.Keyword.Kind == SyntaxKind.LetKeyword;
-        var initializer = BindExpression(syntax.Initializer);
-        var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
-
-        if (!_scope.TryDeclare(variable))
-        {
-            Diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
-        }
-
-        return new BoundVariableDeclaration(variable, initializer);
-    }
-
-    private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
-    {
-        var expression = BindExpression(syntax.Expression);
-        return new BoundExpressionStatement(expression);
-    }
+    #region BindStatement Switch Methods
 
     private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
     {
@@ -112,6 +76,48 @@ internal sealed class Binder
         return new BoundBlockStatement(statements.ToImmutable());
     }
 
+    private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
+    {
+        var expression = BindExpression(syntax.Expression);
+        return new BoundExpressionStatement(expression);
+    }
+
+    private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
+    {
+        var name = syntax.Identifier.Text!;
+        var isReadOnly = syntax.Keyword.Kind == SyntaxKind.LetKeyword;
+        var initializer = BindExpression(syntax.Initializer);
+        var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
+
+        if (!_scope.TryDeclare(variable))
+        {
+            Diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
+        }
+
+        return new BoundVariableDeclaration(variable, initializer);
+    }
+
+
+    private BoundStatement BindIfStatement(IfStatementSyntax syntax)
+    {
+        var condition = BindExpression(syntax.Condition, typeof(bool));
+        var thenStatement = BindStatement(syntax.ThenStatement);
+        var elseStatement = syntax.ElseClause is null
+            ? null
+            : BindStatement(syntax.ElseClause.ElseStatement);
+
+        return new BoundIfStatement(condition, thenStatement, elseStatement);
+    }
+
+    private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
+    {
+        var condition = BindExpression(syntax.Condition, typeof(bool));
+        var body = BindStatement(syntax.Body);
+        return new BoundWhileStatement(condition, body);
+    }
+
+    #endregion
+
     public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax syntax)
     {
         var parentScope = CreateParentScopes(previous);
@@ -123,7 +129,7 @@ internal sealed class Binder
 
         if (previous is not null)
             diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
-        
+
         return new BoundGlobalScope(previous, diagnostics, variables, expression);
     }
 
@@ -157,7 +163,7 @@ internal sealed class Binder
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
         var name = syntax.IdentifierToken.Text!;
-        
+
         if (!_scope.TryLookup(name, out var variable))
         {
             Diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
@@ -188,7 +194,7 @@ internal sealed class Binder
             Diagnostics.ReportCannotConvert(syntax.Expression.Span, boundExpression.Type, variable.Type);
             return boundExpression;
         }
-        
+
         return new BoundAssignmentExpression(variable, boundExpression);
     }
 

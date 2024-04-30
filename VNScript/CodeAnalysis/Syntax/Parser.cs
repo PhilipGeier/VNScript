@@ -48,17 +48,15 @@ internal sealed class Parser
         return ParseAssignmentExpression();
     }
 
-    private StatementSyntax ParseStatement()
-    {
-        return Current.Kind switch
+    private StatementSyntax ParseStatement() =>
+        Current.Kind switch
         {
             SyntaxKind.OpenBraceToken => ParseBlockStatement(),
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(),
             SyntaxKind.IfKeyword => ParseIfStatement(),
+            SyntaxKind.WhileKeyword => ParseWhileStatement(),
             _ => ParseExpressionStatement()
         };
-    }
-
 
 
     private StatementSyntax ParseExpressionStatement()
@@ -106,6 +104,14 @@ internal sealed class Parser
         var keyword = NextToken();
         var statement = ParseStatement();
         return new ElseClauseSyntax(keyword, statement);
+    }
+    
+    private StatementSyntax ParseWhileStatement()
+    {
+        var keyword = MatchToken(SyntaxKind.WhileKeyword);
+        var condition = ParseExpression();
+        var body = ParseStatement();
+        return new WhileStatementSyntax(keyword, condition, body);
     }
 
     private StatementSyntax ParseVariableDeclaration()

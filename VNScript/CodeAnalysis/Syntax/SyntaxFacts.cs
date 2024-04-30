@@ -45,60 +45,51 @@ public static class SyntaxFacts
         }
     }
 
-    public static SyntaxKind GetKeywordKind(string text)
-    {
-        switch (text)
+    public static SyntaxKind GetKeywordKind(string text) =>
+        text switch
         {
-            case "true":
-                return SyntaxKind.TrueKeyword;
-            case "false":
-                return SyntaxKind.FalseKeyword;
-            case "let":
-                return SyntaxKind.LetKeyword;
-            case "var":
-                return SyntaxKind.VarKeyword;
-            case "if":
-                return SyntaxKind.IfKeyword;
-            case "else":
-                return SyntaxKind.ElseKeyword;
-            default:
-                return SyntaxKind.IdentifierToken;
-        }
-    }
+            "true" => SyntaxKind.TrueKeyword,
+            "false" => SyntaxKind.FalseKeyword,
+            "let" => SyntaxKind.LetKeyword,
+            "var" => SyntaxKind.VarKeyword,
+            "if" => SyntaxKind.IfKeyword,
+            "else" => SyntaxKind.ElseKeyword,
+            "while" => SyntaxKind.WhileKeyword,
+            _ => SyntaxKind.IdentifierToken
+        };
 
-    public static string? GetText(SyntaxKind kind)
-    {
-        switch (kind)
+    public static string? GetText(SyntaxKind kind) =>
+        kind switch
         {
-            case SyntaxKind.PlusToken: return "+";
-            case SyntaxKind.MinusToken: return "-";
-            case SyntaxKind.AsteriskToken: return "*";
-            case SyntaxKind.AsteriskAsteriskToken: return "**";
-            case SyntaxKind.SlashToken: return "/";
-            case SyntaxKind.OpenParenthesesToken: return "(";
-            case SyntaxKind.CloseParenthesesToken: return ")";
-            case SyntaxKind.OpenBraceToken: return "{";
-            case SyntaxKind.CloseBraceToken: return "}";
-            case SyntaxKind.BangToken: return "!";
-            case SyntaxKind.AmpersandAmpersandToken: return "&&";
-            case SyntaxKind.PipePipeToken: return "||";
-            case SyntaxKind.EqualsEqualsToken: return "==";
-            case SyntaxKind.BangEqualsToken: return "!=";
-            case SyntaxKind.EqualsToken: return "=";
-            case SyntaxKind.LessToken: return "<";
-            case SyntaxKind.GreaterToken: return ">";
-            case SyntaxKind.LessOrEqualsToken: return "<=";
-            case SyntaxKind.GreaterOrEqualsToken: return ">=";
-            case SyntaxKind.FalseKeyword: return "false";
-            case SyntaxKind.TrueKeyword: return "true";
-            case SyntaxKind.LetKeyword: return "let";
-            case SyntaxKind.VarKeyword: return "var";
-            case SyntaxKind.IfKeyword: return "if";
-            case SyntaxKind.ElseKeyword: return "else";
-            default: return null;
-        }
-    }
-    
+            SyntaxKind.PlusToken => "+",
+            SyntaxKind.MinusToken => "-",
+            SyntaxKind.AsteriskToken => "*",
+            SyntaxKind.AsteriskAsteriskToken => "**",
+            SyntaxKind.SlashToken => "/",
+            SyntaxKind.OpenParenthesesToken => "(",
+            SyntaxKind.CloseParenthesesToken => ")",
+            SyntaxKind.OpenBraceToken => "{",
+            SyntaxKind.CloseBraceToken => "}",
+            SyntaxKind.BangToken => "!",
+            SyntaxKind.AmpersandAmpersandToken => "&&",
+            SyntaxKind.PipePipeToken => "||",
+            SyntaxKind.EqualsEqualsToken => "==",
+            SyntaxKind.BangEqualsToken => "!=",
+            SyntaxKind.EqualsToken => "=",
+            SyntaxKind.LessToken => "<",
+            SyntaxKind.GreaterToken => ">",
+            SyntaxKind.LessOrEqualsToken => "<=",
+            SyntaxKind.GreaterOrEqualsToken => ">=",
+            SyntaxKind.FalseKeyword => "false",
+            SyntaxKind.TrueKeyword => "true",
+            SyntaxKind.LetKeyword => "let",
+            SyntaxKind.VarKeyword => "var",
+            SyntaxKind.IfKeyword => "if",
+            SyntaxKind.ElseKeyword => "else",
+            SyntaxKind.WhileKeyword => "while",
+            _ => null
+        };
+
     public static IEnumerable<SyntaxKind> GetBinaryOperatorKinds()
     {
         var kinds = Enum.GetValues<SyntaxKind>();

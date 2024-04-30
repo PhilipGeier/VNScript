@@ -34,6 +34,8 @@ public enum SyntaxKind
     LetKeyword,
     VarKeyword,
     IfKeyword,
+    ElseKeyword,
+    WhileKeyword,
     
     // Expressions
     LiteralExpression,
@@ -52,5 +54,6 @@ public enum SyntaxKind
     ExpressionStatement,
     VariableDeclaration,
     IfStatement,
-    ElseKeyword
+    WhileStatement,
+    
 }
