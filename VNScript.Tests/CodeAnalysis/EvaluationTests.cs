@@ -66,19 +66,10 @@ public class EvaluationTests
 
         AssertDiagnostics(text, diagnostics);
     }
-
+    
+    
     [Fact]
-    public void Evaluator_Name_Reports_Undefined()
-    {
-        const string text = "[x] * 10";
-
-        const string diagnostics = "Variable 'x' doesn't exist in the current context.";
-
-        AssertDiagnostics(text, diagnostics);
-    }
-
-    [Fact]
-    public void Evaluator_Variable_Reports_IsReadOnly()
+    public void Evaluator_VariableDeclaration_Reports_IsReadOnly()
     {
         const string text = """
                             {
@@ -91,24 +82,10 @@ public class EvaluationTests
         
         AssertDiagnostics(text, diagnostic);
     }
-
+    
+    
     [Fact]
-    public void Evaluator_Assignment_Reports_CannotConvert()
-    {
-        const string text = """
-                            {
-                                var x = 10
-                                x = [false]
-                            }
-                            """;
-
-        const string diagnostic = "Cannot convert type 'System.Boolean' to 'System.Int32'";
-        
-        AssertDiagnostics(text, diagnostic);
-    }
-
-    [Fact]
-    public void Evaluator_Unary_Reports_UndefinedOperator()
+    public void Evaluator_UnaryExpression_Reports_UndefinedOperator()
     {
         const string text = "[+]true";
 
@@ -118,11 +95,36 @@ public class EvaluationTests
     }
 
     [Fact]
-    public void Evaluator_Binary_Reports_UndefinedOperator()
+    public void Evaluator_BinaryExpression_Reports_UndefinedOperator()
     {
         const string text = "false [+] 1";
 
         const string diagnostic = "Binary operator '+' is not defined for types 'System.Boolean' and 'System.Int32'.";
+        
+        AssertDiagnostics(text, diagnostic);
+    }
+
+    [Fact]
+    public void Evaluator_NameExpression_Reports_Undefined()
+    {
+        const string text = "[x] * 10";
+
+        const string diagnostics = "Variable 'x' doesn't exist in the current context.";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_AssignmentExpression_Reports_CannotConvert()
+    {
+        const string text = """
+                            {
+                                var x = 10
+                                x = [false]
+                            }
+                            """;
+
+        const string diagnostic = "Cannot convert type 'System.Boolean' to 'System.Int32'";
         
         AssertDiagnostics(text, diagnostic);
     }
