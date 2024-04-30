@@ -49,20 +49,20 @@ public class EvaluationTests
     [Fact]
     public void Evaluator_VariableDeclaration_Reports_Redeclaration()
     {
-        var text = """
-                   {
-                       var x = 10
-                       var y = 100
-                       {
-                           var x = 10
-                       }
-                       var [x] = 5
-                   }
-                   """;
+        const string text = """
+                            {
+                                var x = 10
+                                var y = 100
+                                {
+                                    var x = 10
+                                }
+                                var [x] = 5
+                            }
+                            """;
 
-        var diagnostics = """
-                          Variable 'x' is already declared.
-                          """;
+        const string diagnostics = """
+                                   Variable 'x' is already declared.
+                                   """;
 
         AssertDiagnostics(text, diagnostics);
     }
@@ -70,9 +70,9 @@ public class EvaluationTests
     [Fact]
     public void Evaluator_Name_Reports_Undefined()
     {
-        var text = "[x] * 10";
+        const string text = "[x] * 10";
 
-        var diagnostics = "Variable 'x' doesn't exist in the current context.";
+        const string diagnostics = "Variable 'x' doesn't exist in the current context.";
 
         AssertDiagnostics(text, diagnostics);
     }
@@ -80,14 +80,14 @@ public class EvaluationTests
     [Fact]
     public void Evaluator_Variable_Reports_IsReadOnly()
     {
-        var text = """
-                   {
-                       let x = 10
-                       x [=] 20
-                   }
-                   """;
+        const string text = """
+                            {
+                                let x = 10
+                                x [=] 20
+                            }
+                            """;
         
-        var diagnostic = $"Variable 'x' is read-only and cannot be assigned to.";
+        const string diagnostic = $"Variable 'x' is read-only and cannot be assigned to.";
         
         AssertDiagnostics(text, diagnostic);
     }
@@ -95,14 +95,14 @@ public class EvaluationTests
     [Fact]
     public void Evaluator_Assignment_Reports_CannotConvert()
     {
-        var text = """
-                   {
-                       var x = 10
-                       x = [false]
-                   }
-                   """;
+        const string text = """
+                            {
+                                var x = 10
+                                x = [false]
+                            }
+                            """;
 
-        var diagnostic = "Cannot convert type 'System.Boolean' to 'System.Int32'";
+        const string diagnostic = "Cannot convert type 'System.Boolean' to 'System.Int32'";
         
         AssertDiagnostics(text, diagnostic);
     }
@@ -110,9 +110,9 @@ public class EvaluationTests
     [Fact]
     public void Evaluator_Unary_Reports_UndefinedOperator()
     {
-        var text = "[+]true";
+        const string text = "[+]true";
 
-        var diagnostics = "Unary operator '+' is not defined for type 'System.Boolean'.";
+        const string diagnostics = "Unary operator '+' is not defined for type 'System.Boolean'.";
 
         AssertDiagnostics(text, diagnostics);
     }
@@ -120,9 +120,73 @@ public class EvaluationTests
     [Fact]
     public void Evaluator_Binary_Reports_UndefinedOperator()
     {
-        var text = "false [+] 1";
+        const string text = "false [+] 1";
 
-        var diagnostic = "Binary operator '+' is not defined for types 'System.Boolean' and 'System.Int32'.";
+        const string diagnostic = "Binary operator '+' is not defined for types 'System.Boolean' and 'System.Int32'.";
+        
+        AssertDiagnostics(text, diagnostic);
+    }
+
+    [Fact]
+    public void Evaluator_IfStatement_Reports_CannotConvert()
+    {
+        const string text = """
+                            {
+                                var x = 0
+                                if [10]
+                                    x = 10
+                            }
+                            """;
+        
+        const string diagnostic = "Cannot convert type 'System.Int32' to 'System.Boolean'";
+        
+        AssertDiagnostics(text, diagnostic);
+    }
+    
+    [Fact]
+    public void Evaluator_WhileStatement_Reports_CannotConvert()
+    {
+        const string text = """
+                            {
+                                var x = 0
+                                while [10]
+                                    x = 10
+                            }
+                            """;
+        
+        const string diagnostic = "Cannot convert type 'System.Int32' to 'System.Boolean'";
+        
+        AssertDiagnostics(text, diagnostic);
+    }
+    
+    [Fact]
+    public void Evaluator_ForStatement_Reports_CannotConvert_LowerBound()
+    {
+        const string text = """
+                            {
+                                var result = 0
+                                for i = [false] to 10
+                                    result = result + i
+                            }
+                            """;
+        
+        const string diagnostic = "Cannot convert type 'System.Boolean' to 'System.Int32'";
+        
+        AssertDiagnostics(text, diagnostic);
+    }
+    
+    [Fact]
+    public void Evaluator_ForStatement_Reports_CannotConvert_UpperBound()
+    {
+        const string text = """
+                            {
+                                var result = 0
+                                for i = 1 to [true]
+                                    result = result + i
+                            }
+                            """;
+        
+        const string diagnostic = "Cannot convert type 'System.Boolean' to 'System.Int32'";
         
         AssertDiagnostics(text, diagnostic);
     }
