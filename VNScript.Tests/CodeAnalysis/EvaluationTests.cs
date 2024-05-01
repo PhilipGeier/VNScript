@@ -67,7 +67,6 @@ public class EvaluationTests
         AssertDiagnostics(text, diagnostics);
     }
     
-    
     [Fact]
     public void Evaluator_VariableDeclaration_Reports_IsReadOnly()
     {
@@ -82,7 +81,6 @@ public class EvaluationTests
         
         AssertDiagnostics(text, diagnostic);
     }
-    
     
     [Fact]
     public void Evaluator_UnaryExpression_Reports_UndefinedOperator()
@@ -115,6 +113,16 @@ public class EvaluationTests
     }
 
     [Fact]
+    public void Evaluator_NameExpression_Reports_NoErrorForInsertedToken()
+    {
+        const string text = "[]";
+
+        const string diagnostics = "Unexpected token: <EndOfFileToken>, expected <IdentifierToken>.";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+    
+    [Fact]
     public void Evaluator_AssignmentExpression_Reports_CannotConvert()
     {
         const string text = """
@@ -129,6 +137,23 @@ public class EvaluationTests
         AssertDiagnostics(text, diagnostic);
     }
 
+    [Fact]
+    public void Evaluator_BlockStatement_NoInfiniteLoop()
+    {
+        const string text = """
+                            {
+                            [)]
+                            []
+                            """;
+        
+        const string diagnostic = """
+                                  Unexpected token: <CloseParenthesesToken>, expected <IdentifierToken>.
+                                  Unexpected token: <EndOfFileToken>, expected <CloseBraceToken>.
+                                  """;
+        
+        AssertDiagnostics(text, diagnostic);
+    }
+    
     [Fact]
     public void Evaluator_IfStatement_Reports_CannotConvert()
     {
@@ -214,12 +239,15 @@ public class EvaluationTests
 
         var result = compilation.Evaluate(new Dictionary<VariableSymbol?, object>());
 
-        var expectedSpan = annotatedText.Spans[0];
-        var actualSpan = result.Diagnostics[0].Span;
-        Assert.Equal(expectedSpan, actualSpan);
+        for (var i = 0; i < result.Diagnostics.Length; i++)
+        {
+            var expectedSpan = annotatedText.Spans[i];
+            var actualSpan = result.Diagnostics[i].Span;
+            
+            Assert.Equal(expectedSpan, actualSpan);
+        }
 
-        var expectedMessage = expectedDiagnostics;
-        var actualMessage = result.Diagnostics[0].Message;
-        Assert.Equal(expectedMessage, actualMessage);
+        var actualMessage = string.Join("\r\n", result.Diagnostics.Select(x => x.Message));
+        Assert.Equal(expectedDiagnostics, actualMessage);
     }
 }
