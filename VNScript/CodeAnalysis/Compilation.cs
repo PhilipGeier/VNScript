@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using VNScript.CodeAnalysis.Binding;
+using VNScript.CodeAnalysis.Lowering;
 using VNScript.CodeAnalysis.Syntax;
 
 namespace VNScript.CodeAnalysis;
@@ -49,8 +50,9 @@ public class Compilation
         {
             return new EvaluationResult(diagnostics.ToImmutableArray(), null);
         }
-        
-        var evaluator = new Evaluation(GlobalScope.Statement, variables);
+
+        var statement = GetStatement();
+        var evaluator = new Evaluation(statement, variables);
         var value = evaluator.Evaluate();
 
         return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
@@ -58,6 +60,13 @@ public class Compilation
 
     public void EmitTree(TextWriter writer)
     {
-        GlobalScope?.Statement.WriteTo(writer);
+        var statement = GetStatement();
+        statement.WriteTo(writer);
+    }
+    
+    private BoundStatement GetStatement()
+    {
+        var result = GlobalScope?.Statement;
+        return Lowerer.Lower(result!);
     }
 }
