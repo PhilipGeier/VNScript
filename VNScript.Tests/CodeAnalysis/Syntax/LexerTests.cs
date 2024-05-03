@@ -41,11 +41,11 @@ public class LexerTests
 
         Assert.Equal(2, tokens.Length);
 
-        Assert.Equal(tokens[0].Kind, t1Kind);
-        Assert.Equal(tokens[0].Text, t1Text);
+        Assert.Equal(t1Kind, tokens[0].Kind);
+        Assert.Equal(t1Text, tokens[0].Text);
 
-        Assert.Equal(tokens[1].Kind, t2Kind);
-        Assert.Equal(tokens[1].Text, t2Text);
+        Assert.Equal(t2Kind, tokens[1].Kind);
+        Assert.Equal(t2Text, tokens[1].Text);
     }
 
     [Theory]
@@ -58,14 +58,14 @@ public class LexerTests
 
         Assert.Equal(3, tokens.Length);
 
-        Assert.Equal(tokens[0].Kind, t1Kind);
-        Assert.Equal(tokens[0].Text, t1Text);
+        Assert.Equal(t1Kind, tokens[0].Kind);
+        Assert.Equal(t1Text, tokens[0].Text);
 
-        Assert.Equal(tokens[1].Kind, separatorKind);
-        Assert.Equal(tokens[1].Text, separatorText);
+        Assert.Equal(separatorKind, tokens[1].Kind);
+        Assert.Equal(separatorText, tokens[1].Text);
 
-        Assert.Equal(tokens[2].Kind, t2Kind);
-        Assert.Equal(tokens[2].Text, t2Text);
+        Assert.Equal(t2Kind, tokens[2].Kind);
+        Assert.Equal(t2Text, tokens[2].Text);
     }
 
     public static IEnumerable<object[]> GetTokensData()
