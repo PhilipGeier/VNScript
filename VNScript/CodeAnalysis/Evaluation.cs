@@ -6,11 +6,11 @@ namespace VNScript.CodeAnalysis;
 
 internal sealed class Evaluation
 {
-    private readonly BoundStatement _root;
+    private readonly BoundBlockStatement _root;
     private readonly Dictionary<VariableSymbol, object> _variables;
     private object _lastValue = null!;
 
-    public Evaluation(BoundStatement root, Dictionary<VariableSymbol, object> variables)
+    public Evaluation(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
     {
         _root = root;
         _variables = variables;
@@ -18,7 +18,54 @@ internal sealed class Evaluation
 
     public object Evaluate()
     {
-        EvaluateStatement(_root);
+        var labelToIndex = new Dictionary<LabelSymbol, int>();
+
+        for (var i = 0; i < _root.Statements.Length; i++)
+        {
+            if (_root.Statements[i] is BoundLabelStatement l)
+            {
+                labelToIndex.Add(l.Symbol, i + 1);
+            }
+        }
+
+        var index = 0;
+        while (index < _root.Statements.Length)
+        {
+            var s = _root.Statements[index];
+            switch (s.Kind)
+            {
+                case BoundNodeKind.ExpressionStatement:
+                    EvaluateExpressionStatement((BoundExpressionStatement)s);
+                    index++;
+                    break;
+                case BoundNodeKind.VariableDeclaration:
+                    EvaluateVariableDeclaration((BoundVariableDeclaration)s);
+                    index++;
+                    break;
+                case BoundNodeKind.ConditionalGotoStatement:
+                    var cgs = (BoundConditionalGotoStatement)s;
+                    var condition = (bool)EvaluateExpression(cgs.Condition);
+                    if (condition && !cgs.JumpIfFalse || !condition && cgs.JumpIfFalse)
+                    {
+                        index = labelToIndex[cgs.Label];
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                    break;
+                case BoundNodeKind.GotoStatement:
+                    var gs = (BoundGotoStatement)s;
+                    index = labelToIndex[gs.Label];
+                    break;
+                case BoundNodeKind.LabelStatement:
+                    index++;
+                    break;
+                default:
+                    throw new Exception($"Unexpected statement {s.Kind}");
+            }
+        }
+        
         return _lastValue;
     }
 
@@ -35,41 +82,8 @@ internal sealed class Evaluation
         };
     }
 
-
-    private void EvaluateStatement(BoundStatement statement)
-    {
-        switch (statement.Kind)
-        {
-            case BoundNodeKind.BlockStatement:
-                EvaluateBlockStatement((BoundBlockStatement)statement);
-                break;
-            case BoundNodeKind.ExpressionStatement:
-                EvaluateExpressionStatement((BoundExpressionStatement)statement);
-                break;
-            case BoundNodeKind.VariableDeclaration:
-                EvaluateVariableDeclaration((BoundVariableDeclaration)statement);
-                break;
-            case BoundNodeKind.IfStatement:
-                EvaluateIfStatement((BoundIfStatement)statement);
-                break;
-            case BoundNodeKind.WhileStatement:
-                EvaluateWhileStatement((BoundWhileStatement)statement);
-                break;
-            default:
-                throw new Exception($"Unexpected statement {statement.Kind}");
-        }
-    }
-
     #region EvaluateStatement Switch Methods
-
-    private void EvaluateBlockStatement(BoundBlockStatement statement)
-    {
-        foreach (var st in statement.Statements)
-        {
-            EvaluateStatement(st);
-        }
-    }
-
+    
     private void EvaluateExpressionStatement(BoundExpressionStatement statement)
     {
         _lastValue = EvaluateExpression(statement.Expression);
@@ -80,27 +94,6 @@ internal sealed class Evaluation
         var value = EvaluateExpression(statement.Initializer);
         _variables[statement.Variable!] = value;
         _lastValue = value;
-    }
-
-    private void EvaluateIfStatement(BoundIfStatement statement)
-    {
-        var condition = (bool)EvaluateExpression(statement.Condition);
-        if (condition)
-        {
-            EvaluateStatement(statement.ThenStatement);
-        }
-        else if (statement.ElseStatement is not null)
-        {
-            EvaluateStatement(statement.ElseStatement);
-        }
-    }
-
-    private void EvaluateWhileStatement(BoundWhileStatement statement)
-    {
-        while ((bool)EvaluateExpression(statement.Condition))
-        {
-            EvaluateStatement(statement.Body);
-        }
     }
     
     #endregion

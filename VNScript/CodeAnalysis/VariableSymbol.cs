@@ -12,4 +12,6 @@ public sealed class VariableSymbol
         IsReadOnly = isReadOnly;
         Type = type;
     }
+
+    public override string ToString() => (IsReadOnly ? "r_" : "") + Name;
 }

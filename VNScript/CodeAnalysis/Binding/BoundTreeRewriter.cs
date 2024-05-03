@@ -15,20 +15,31 @@ internal abstract class BoundTreeRewriter
             BoundNodeKind.WhileStatement => RewriteWhileStatement((BoundWhileStatement)node),
             BoundNodeKind.IfStatement => RewriteIfStatement((BoundIfStatement)node),
             BoundNodeKind.VariableDeclaration => RewriteVariableDeclaration((BoundVariableDeclaration)node),
+            BoundNodeKind.LabelStatement => RewriteLabelStatement((BoundLabelStatement)node),
+            BoundNodeKind.GotoStatement => RewriteGotoStatement((BoundGotoStatement)node),
+            BoundNodeKind.ConditionalGotoStatement => RewriteConditionalGotoStatement((BoundConditionalGotoStatement)node),
             _ => throw new Exception($"Unexpected node: {node.Kind}")
         };
     }
+    
+    
+    protected virtual BoundStatement RewriteConditionalGotoStatement(BoundConditionalGotoStatement node)
+    {
+        var condition = RewriteExpression(node.Condition);
+        return condition == node.Condition
+            ? node
+            : new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfFalse);
+    }
 
-    public virtual BoundExpression RewriteExpression(BoundExpression node) =>
-        node.Kind switch
-        {
-            BoundNodeKind.LiteralExpression => RewriteLiteralExpression((BoundLiteralExpression)node),
-            BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
-            BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
-            BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
-            BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression)node),
-            _ => throw new Exception($"Unexpected node: {node.Kind}")
-        };
+    protected virtual BoundStatement RewriteGotoStatement(BoundGotoStatement node)
+    {
+        return node;
+    }
+
+    protected virtual BoundStatement RewriteLabelStatement(BoundLabelStatement node)
+    {
+        return node;
+    }
     
     protected virtual BoundStatement RewriteVariableDeclaration(BoundVariableDeclaration node)
     {
@@ -123,6 +134,17 @@ internal abstract class BoundTreeRewriter
 
         return new BoundBlockStatement(builder.MoveToImmutable());
     }
+
+    public virtual BoundExpression RewriteExpression(BoundExpression node) =>
+        node.Kind switch
+        {
+            BoundNodeKind.LiteralExpression => RewriteLiteralExpression((BoundLiteralExpression)node),
+            BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
+            BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
+            BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
+            BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression)node),
+            _ => throw new Exception($"Unexpected node: {node.Kind}")
+        };
 
     protected virtual BoundExpression RewriteUnaryExpression(BoundUnaryExpression node)
     {

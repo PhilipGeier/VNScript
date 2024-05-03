@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using VNScript.CodeAnalysis.Binding.Enums;
 using VNScript.CodeAnalysis.Syntax;
 
