@@ -55,4 +55,9 @@ public class Compilation
 
         return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
     }
+
+    public void EmitTree(TextWriter writer)
+    {
+        GlobalScope?.Statement.WriteTo(writer);
+    }
 }
