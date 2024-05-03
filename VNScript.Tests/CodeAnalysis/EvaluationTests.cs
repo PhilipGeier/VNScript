@@ -166,10 +166,7 @@ public class EvaluationTests
                             []
                             """;
         
-        const string diagnostic = """
-                                  Unexpected token: <CloseParenthesesToken>, expected <IdentifierToken>.
-                                  Unexpected token: <EndOfFileToken>, expected <CloseBraceToken>.
-                                  """;
+        const string diagnostic = "Unexpected token: <CloseParenthesesToken>, expected <IdentifierToken>.\r\nUnexpected token: <EndOfFileToken>, expected <CloseBraceToken>.";
         
         AssertDiagnostics(text, diagnostic);
     }
