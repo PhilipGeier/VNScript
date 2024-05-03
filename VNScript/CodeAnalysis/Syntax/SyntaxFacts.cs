@@ -9,6 +9,7 @@ public static class SyntaxFacts
             case SyntaxKind.PlusToken:
             case SyntaxKind.MinusToken:
             case SyntaxKind.BangToken:
+            case SyntaxKind.TildeToken:
                 return 7;
             default:
                 return 0;
@@ -37,8 +38,11 @@ public static class SyntaxFacts
                 return 3;
 
             case SyntaxKind.AmpersandAmpersandToken:
+            case SyntaxKind.AmpersandToken:
                 return 2;
             case SyntaxKind.PipePipeToken:
+            case SyntaxKind.PipeToken:
+            case SyntaxKind.HatToken:
                 return 1;
             default:
                 return 0;
@@ -65,6 +69,7 @@ public static class SyntaxFacts
         {
             SyntaxKind.PlusToken => "+",
             SyntaxKind.MinusToken => "-",
+            SyntaxKind.TildeToken => "~",
             SyntaxKind.AsteriskToken => "*",
             SyntaxKind.AsteriskAsteriskToken => "**",
             SyntaxKind.SlashToken => "/",
@@ -82,6 +87,9 @@ public static class SyntaxFacts
             SyntaxKind.GreaterToken => ">",
             SyntaxKind.LessOrEqualsToken => "<=",
             SyntaxKind.GreaterOrEqualsToken => ">=",
+            SyntaxKind.AmpersandToken => "&",
+            SyntaxKind.PipeToken => "|",
+            SyntaxKind.HatToken => "^",
             SyntaxKind.FalseKeyword => "false",
             SyntaxKind.TrueKeyword => "true",
             SyntaxKind.LetKeyword => "let",

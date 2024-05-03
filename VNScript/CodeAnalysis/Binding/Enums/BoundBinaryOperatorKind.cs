@@ -14,5 +14,8 @@ internal enum BoundBinaryOperatorKind
     LessThan,
     LessThanOrEqualTo,
     GreaterThan,
-    GreaterThanOrEqualTo
+    GreaterThanOrEqualTo,
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXor
 }

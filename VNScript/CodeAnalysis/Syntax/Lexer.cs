@@ -14,7 +14,6 @@ internal class Lexer
     private object? _value;
 
     private char Current => Peek(0);
-    private char Lookahead => Peek(1);
 
     public Lexer(SourceText text)
     {
@@ -68,6 +67,14 @@ internal class Lexer
                 _kind = SyntaxKind.CloseBraceToken;
                 _position++;
                 break;
+            case '~':
+                _kind = SyntaxKind.TildeToken;
+                _position++;
+                break;
+            case '^':
+                _kind = SyntaxKind.HatToken;
+                _position++;
+                break;
             case '*':
                 _position++;
                 if (Current != '*')
@@ -91,20 +98,26 @@ internal class Lexer
                 _position++;
                 break;
             case '&':
-                if (Lookahead == '&')
+                _position++;
+                if (Current != '&')
                 {
-                    _kind = SyntaxKind.AmpersandAmpersandToken;
-                    _position += 2;
+                    _kind = SyntaxKind.AmpersandToken;
+                    break;
                 }
 
+                _kind = SyntaxKind.AmpersandAmpersandToken;
+                _position++;
                 break;
             case '|':
-                if (Lookahead == '|')
+                _position++;
+                if (Current != '|')
                 {
-                    _kind = SyntaxKind.PipePipeToken;
-                    _position += 2;
+                    _kind = SyntaxKind.PipeToken;
+                    break;
                 }
 
+                _kind = SyntaxKind.PipePipeToken;
+                _position++;
                 break;
             case '=':
                 _position++;
