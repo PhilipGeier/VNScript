@@ -28,7 +28,7 @@ internal abstract class BoundTreeRewriter
         var condition = RewriteExpression(node.Condition);
         return condition == node.Condition
             ? node
-            : new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfFalse);
+            : new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfTrue);
     }
 
     protected virtual BoundStatement RewriteGotoStatement(BoundGotoStatement node)
