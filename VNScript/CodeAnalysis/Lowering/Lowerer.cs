@@ -86,6 +86,12 @@ internal sealed class Lowerer : BoundTreeRewriter
     {
         if (node.ElseStatement is null)
         {
+            // var a = 0
+            // goto endLabel if a == 4
+            //      a = 10
+            // endLabel
+            // a
+            
             var endLabel = GenerateLabel();
 
             var gotoFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, false);

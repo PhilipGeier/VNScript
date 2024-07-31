@@ -45,7 +45,7 @@ internal sealed class Evaluation
                 case BoundNodeKind.ConditionalGotoStatement:
                     var cgs = (BoundConditionalGotoStatement)s;
                     var condition = (bool)EvaluateExpression(cgs.Condition);
-                    if (condition && cgs.JumpIfTrue)
+                    if (condition == cgs.JumpIfTrue)
                     {
                         index = labelToIndex[cgs.Label];
                     }
