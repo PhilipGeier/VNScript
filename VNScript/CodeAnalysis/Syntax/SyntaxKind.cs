@@ -31,6 +31,7 @@ public enum SyntaxKind
     AmpersandToken,
     PipeToken,
     HatToken,
+    StringToken,
     
     // Keywords
     FalseKeyword,

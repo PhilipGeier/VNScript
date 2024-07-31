@@ -127,4 +127,18 @@ public static class SyntaxFacts
             }
         }
     }
+
+    public static bool IsEscapableStringChar(char c)
+    {
+        return GetEscapableStringChars().Contains(c);
+    }
+    
+    public static IEnumerable<char> GetEscapableStringChars()
+    {
+        return new[]
+        {
+            '\\',
+            '"',
+        };
+    }
 }

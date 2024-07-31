@@ -20,11 +20,17 @@ internal sealed class VNScriptRepl : Repl
         {
             var isKeyword = token.Kind.ToString().EndsWith("Keyword");
             var isNumber = token.Kind == SyntaxKind.NumberToken;
+            var isIdentifier = token.Kind == SyntaxKind.IdentifierToken;
+            var isString = token.Kind == SyntaxKind.StringToken;
                 
             if (isKeyword)
-                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.ForegroundColor = ConsoleColor.DarkBlue;
             else if (isNumber)
-                Console.ForegroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+            else if (isIdentifier)
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+            else if (isString)
+                Console.ForegroundColor = ConsoleColor.Green;
             
             Console.Write(token.Text);
             
@@ -60,25 +66,24 @@ internal sealed class VNScriptRepl : Repl
     {
         if (string.IsNullOrEmpty(text))
             return true;
-        
+
+        var lastTwoLinesAreBlank = text.Split(Environment.NewLine).Reverse()
+            .TakeWhile(s => string.IsNullOrEmpty(s))
+            .Take(2)
+            .Count() == 2;
+
+        if (lastTwoLinesAreBlank)
+            return true;
         
         var syntaxTree = SyntaxTree.Parse(text);
 
-        if (GetLastToken(syntaxTree.Root.Statement).IsMissing)
+        if (syntaxTree.Root.GetLastToken().IsMissing)
             return false;
 
         return true;
     }
 
-    private SyntaxToken GetLastToken(SyntaxNode node)
-    {
-        while (true)
-        {
-            if (node is SyntaxToken token) return token;
-
-            node = node.GetChildren().Last();
-        }
-    }
+    
 
     protected override void EvaluateSubmission(string text)
     {

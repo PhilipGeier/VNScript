@@ -1,9 +1,27 @@
-﻿using VNScript.CodeAnalysis.Syntax;
+﻿using System.Linq.Expressions;
+using Microsoft.VisualBasic;
+using VNScript.CodeAnalysis.Syntax;
+using VNScript.CodeAnalysis.Text;
 
 namespace VNScript.Tests.CodeAnalysis.Syntax;
 
 public class LexerTests
 {
+    [Fact]
+    public void Lexer_Lexes_UnterminatedString()
+    {
+        const string text = "\"Text";
+        var tokens = SyntaxTree.ParseTokens(text, out var diagnostics);
+
+        var token = Assert.Single(tokens);
+        Assert.Equal(SyntaxKind.StringToken, token.Kind);
+        Assert.Equal(text, token.Text);
+
+        var diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(new TextSpan(0, 1), diagnostic.Span);
+        Assert.Equal("Unterminated string literal.", diagnostic.Message);
+    }
+    
     [Fact]
     public void Lexer_Tests_AllTokens()
     {
@@ -112,7 +130,10 @@ public class LexerTests
             (SyntaxKind.IdentifierToken, "a"),
             (SyntaxKind.IdentifierToken, "abc"),
             (SyntaxKind.NumberToken, "1"),
-            (SyntaxKind.NumberToken, "123")
+            (SyntaxKind.NumberToken, "123"),
+            (SyntaxKind.StringToken, "\"Test\""),
+            (SyntaxKind.StringToken, "\"Test \\\" Test\""),
+            (SyntaxKind.StringToken, "\"Test \\\"Test\\\"\""),
         };
 
         return dynamicTokens!.Concat(fixedTokens)!;
@@ -145,6 +166,8 @@ public class LexerTests
 
         if (t1Kind == SyntaxKind.NumberToken && t2Kind == SyntaxKind.NumberToken) return true;
 
+        if (t1Kind == SyntaxKind.StringToken && t2Kind == SyntaxKind.StringToken) return true;
+        
         if (t1Kind == SyntaxKind.BangToken && t2Kind == SyntaxKind.EqualsToken) return true;
 
         if (t1Kind == SyntaxKind.BangToken && t2Kind == SyntaxKind.EqualsEqualsToken) return true;

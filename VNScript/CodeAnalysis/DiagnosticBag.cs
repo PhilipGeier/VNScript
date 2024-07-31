@@ -31,7 +31,19 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         var message = $"Bad character in input: '{character}'.";
         Report(new TextSpan(position, 1), message);
     }
-
+    
+    public void ReportUnterminatedString(TextSpan span)
+    {
+        const string message = "Unterminated string literal.";
+       
+        Report(span, message);
+    }
+    public void ReportUnrecognizedEscapeSequence(TextSpan span)
+    {
+        const string message = "Unrecognized escape sequence";
+        Report(span, message);
+    }
+    
     public void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
     {
         var message = $"Unexpected token: <{actualKind}>, expected <{expectedKind}>.";
@@ -81,4 +93,7 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         var diagnostic = new Diagnostic(span, message);
         _diagnostics.Add(diagnostic);
     }
+
+
+
 }

@@ -1,4 +1,5 @@
-﻿using VNScript.CodeAnalysis.Text;
+﻿using System.Text;
+using VNScript.CodeAnalysis.Text;
 
 namespace VNScript.CodeAnalysis.Syntax;
 
@@ -14,6 +15,7 @@ internal class Lexer
     private object? _value;
 
     private char Current => Peek(0);
+    private char Lookahead => Peek(1);
 
     public Lexer(SourceText text)
     {
@@ -152,11 +154,25 @@ internal class Lexer
                 _kind = SyntaxKind.GreaterOrEqualsToken;
                 _position++;
                 break;
-            case '1': case '2': case '3': case '4': case '5':
-            case '6': case '7': case '8': case '9': case '0':
+            case '"':
+                ReadString();
+                break;
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '0':
                 ReadNumber();
                 break;
-            case ' ': case '\t': case '\n': case '\r':
+            case ' ':
+            case '\t':
+            case '\n':
+            case '\r':
                 ReadWhitespace();
                 break;
             default:
@@ -199,6 +215,55 @@ internal class Lexer
         var text = _text.ToString(_start, length);
 
         _kind = SyntaxFacts.GetKeywordKind(text);
+    }
+
+    private void ReadString()
+    {
+        // Skip the current quote
+        _position++;
+        var sb = new StringBuilder();
+
+        var done = false;
+        while (!done)
+        {
+            switch (Current)
+            {
+                case '\0':
+                case '\r':
+                case '\n':
+                {
+                    var span = new TextSpan(_start, 1);
+                    Diagnostics.ReportUnterminatedString(span);
+                    done = true;
+                    break;
+                }
+                case '"':
+                    _position++;
+                    done = true;
+                    break;
+                case '\\':
+                    if (Lookahead == '"')
+                    {
+                        _position++;
+                        sb.Append(Current);
+                        _position++;
+                    }
+                    else
+                    {
+                        var span = new TextSpan(_position, 2);
+                        Diagnostics.ReportUnrecognizedEscapeSequence(span);
+                        _position++;
+                    }
+                    break;
+                default:
+                    sb.Append(Current);
+                    _position++;
+                    break;
+            }
+        }
+
+        _kind = SyntaxKind.StringToken;
+        _value = sb.ToString();
     }
 
     private void ReadWhitespace()

@@ -212,6 +212,8 @@ internal sealed class Parser
                 return ParseBooleanLiteral();
             case SyntaxKind.NumberToken:
                 return ParseNumberLiteral();
+            case SyntaxKind.StringToken:
+                return ParseStringLiteral();
             case SyntaxKind.IdentifierToken:
             default:
                 return ParseNameExpression();
@@ -241,6 +243,12 @@ internal sealed class Parser
             : MatchToken(SyntaxKind.FalseKeyword);
         
         return new LiteralExpressionSyntax(keywordToken, isTrue);
+    }
+    
+    private ExpressionSyntax ParseStringLiteral()
+    {
+        var stringToken = MatchToken(SyntaxKind.StringToken);
+        return new LiteralExpressionSyntax(stringToken);
     }
 
     private ExpressionSyntax ParseNameExpression()
