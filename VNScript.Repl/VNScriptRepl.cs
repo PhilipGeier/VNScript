@@ -64,9 +64,22 @@ internal sealed class VNScriptRepl : Repl
         
         var syntaxTree = SyntaxTree.Parse(text);
 
-        return !syntaxTree.Diagnostics.Any();
+        if (GetLastToken(syntaxTree.Root.Statement).IsMissing)
+            return false;
+
+        return true;
     }
-    
+
+    private SyntaxToken GetLastToken(SyntaxNode node)
+    {
+        while (true)
+        {
+            if (node is SyntaxToken token) return token;
+
+            node = node.GetChildren().Last();
+        }
+    }
+
     protected override void EvaluateSubmission(string text)
     {
         var syntaxTree = SyntaxTree.Parse(text);
